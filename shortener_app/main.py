@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Request
+from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 import validators
 import secrets
@@ -16,6 +17,10 @@ def get_db():
         db.close()
 
 def raise_bad_request(message):
+    raise HTTPException(status_code=400, detail=message)
+
+def raise_not_found(request):
+    message = f"URL '{request.url}' doesn't exist"
     raise HTTPException(status_code=400, detail=message)
 
 
@@ -46,3 +51,22 @@ def create_url(url: schemas.URLBase, db: Session = Depends(get_db)):
     db_url.admin_url = db_url.secret_key
     
     return db_url
+
+
+@app.get("/{url_key}")
+
+def forward_to_target_url(
+        url_key: str,
+        request: Request,
+        db: Session = Depends(get_db)
+    ):
+
+    db_url = (
+        db.query(models.URL)
+        .filter(models.URL.key == url_key, models.URL.is_active)
+        .first()
+    )
+    if db_url:
+        return RedirectResponse(db_url.target_url)
+    else:
+        raise_not_found(request)
