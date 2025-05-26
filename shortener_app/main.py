@@ -9,15 +9,10 @@ app = FastAPI()
 models.Base.metadata.create_all(bind=engine)
 
 def get_db():
-
     db = SessionLocal()
-
     try:
-
         yield db
-
     finally:
-
         db.close()
 
 def raise_bad_request(message):
@@ -47,7 +42,6 @@ def create_url(url: schemas.URLBase, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_url)
     
-    # Add the url and admin_url fields as aliases
     db_url.url = db_url.key
     db_url.admin_url = db_url.secret_key
     
