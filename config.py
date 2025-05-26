@@ -11,6 +11,3 @@ def get_setting() -> Settings:
     settings = Settings()
     print(f"Loading settings for: {settings.env_name}")
     return settings
-
-
-asdasd
