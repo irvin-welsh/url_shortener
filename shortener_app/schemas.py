@@ -6,10 +6,15 @@ class URLBase(BaseModel):
 class URL(URLBase):
     is_active: bool
     clicks: int
+    key: str
+    secret_key: str
 
     class Config:
-        crm_mode = True
+        orm_mode = True  
 
 class URLInfo(URL):
     url: str
     admin_url: str
+
+    class Config:
+        orm_mode = True
